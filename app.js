@@ -123,14 +123,18 @@ const deleteUser = (req, res) => {
 });
 }
 
+const toursRouter = express.Router();
+app.use('/api/v1/tours', toursRouter);
+const usersRouter = express.Router();
+app.use('/api/v1/users', usersRouter);
 
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
+toursRouter.route('/').get(getAllTours).post(createTour);
 
-app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
+toursRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
-app.route('/api/v1/users').get(getAllUsers).post(createUser);
+usersRouter.route('/').get(getAllUsers).post(createUser);
 
-app.route('/api/v1/users/:id').get(getUser).patch(updateUser).delete(deleteUser);
+usersRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
 const port = 3000; 
 
