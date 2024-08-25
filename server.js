@@ -7,7 +7,7 @@ dotenv.config({ path: './config.env' });
 
 const DB = process.env.DB.replace('<PASSWORD>', process.env.DB_PASSWORD);
 
-mongoose.connect(DB).then(() => {
+mongoose.connect(DB,{dbName:'natours'}).then(() => {
     console.log('DB connection successful');
 });
 
@@ -28,6 +28,17 @@ const tourSchema = new mongoose.Schema({
 });
 
 const Tour = mongoose.model('Tour',tourSchema);
+
+const testTour = new Tour({
+    name: 'The Park Camper',
+    price:997
+});
+
+testTour.save().then(
+    doc => {
+        console.log(doc);
+    }
+).catch(err => {console.log(err);})
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
