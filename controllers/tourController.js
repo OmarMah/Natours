@@ -1,5 +1,13 @@
 const Tour = require('./../models/tourModel');
 
+exports.aliasTopTours = (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    next();
+};
+
+
 exports.getAllTours = async (req, res) => {
 
     try{
@@ -9,22 +17,24 @@ exports.getAllTours = async (req, res) => {
         excludedFields.forEach(el => delete queryObj[el]);
 
 
-        const queryStr = JSON.stringify(queryObj);
+        let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
-        queryObj = JSON.parse(queryStr);
 
-        let query = await Tour.find(queryObj);
 
+        let query = Tour.find(JSON.parse(queryStr));
+        
         if(req.query.sort){
             const sortBy = req.query.sort.split(',').join(' ');
+            console.log(sortBy);
             query = query.sort(sortBy);
         } else {
             query = query.sort('-createdAt');
         }
-
+        
         if(req.query.fields){
             const fields = req.query.fields.split(',').join(' ');
+            console.log(fields);
             query = query.select(fields);
         } else {
             query = query.select('-__v');
@@ -34,6 +44,7 @@ exports.getAllTours = async (req, res) => {
             const page = req.query.page * 1 || 1;
             const limit = req.query.limit * 1 || 100;
             const skip = (page - 1) * limit;
+            console.log(skip,limit);
             query = query.skip(skip).limit(limit);
 
             const numTours = await Tour.countDocuments();
